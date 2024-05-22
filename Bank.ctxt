@@ -1,0 +1,11 @@
+#BlueJ class context
+comment0.target=Bank
+comment1.params=
+comment1.target=Bank()
+comment2.params=user\ amount
+comment2.target=boolean\ processPayment(User,\ double)
+comment3.params=paymentDetails
+comment3.target=boolean\ verifyPaymentDetails(java.lang.String)
+comment4.params=transactionId
+comment4.target=Transaction\ getTransactionById(int)
+numComments=5

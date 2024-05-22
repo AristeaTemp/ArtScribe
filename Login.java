@@ -2,9 +2,16 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class Login {
-    private static final String DB_URL = "jdbc:sqlite:C:/Users/despina/Desktop/ceid/τλ/artscribe.db"; // Adjust the path if needed
+    private static final String DB_URL = "jdbc:sqlite:artscribe.db"; 
 
     public static void main(String[] args) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Failed to load SQLite JDBC driver.");
+            e.printStackTrace();
+            return;
+        }
         Scanner scanner = new Scanner(System.in);
         int choice = 0;
         while (choice != 3) {
@@ -42,15 +49,18 @@ public class Login {
         System.out.println("Enter your password:");
         String password = scanner.nextLine();
 
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
-            String query = "INSERT INTO users (name, surname, phone_number, email, password, ) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, name);
-            statement.setString(2, surname);
-            statement.setString(3, phoneNumber);
-            statement.setString(4, email);
-            statement.setString(5, password);
-            statement.executeUpdate();
+        String insertQuery = "INSERT INTO User (Name, Surname, Phone_number, Email, Password) VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+             
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, surname);
+            preparedStatement.setString(3, phoneNumber);
+            preparedStatement.setString(4, email);
+            preparedStatement.setString(5, password);
+            
+            preparedStatement.executeUpdate();
             System.out.println("Registration successful.");
         } catch (SQLException e) {
             if (e.getMessage().contains("UNIQUE constraint failed")) {
@@ -67,20 +77,23 @@ public class Login {
         System.out.println("Enter your password:");
         String password = scanner.nextLine();
 
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
-            String query = "SELECT * FROM users WHERE email = ? AND password = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, email);
-            statement.setString(2, password);
-            ResultSet resultSet = statement.executeQuery();
+        String query = "SELECT * FROM User WHERE Email = ? AND Password = ?";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
                 System.out.println("Login successful.");
                 User user = new User(
-                        resultSet.getString("name"),
-                        resultSet.getString("surname"),
-                        resultSet.getString("phone_number"),
-                        resultSet.getString("email"),
-                        resultSet.getString("password")
+                        resultSet.getString("Name"),
+                        resultSet.getString("Surname"),
+                        resultSet.getString("Phone_number"),
+                        resultSet.getString("Email"),
+                        resultSet.getString("Password")
                 );
                 System.out.println("Welcome, " + user.getName() + " " + user.getSurname());
             } else {
@@ -89,5 +102,29 @@ public class Login {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+}
+
+class User {
+    private String name;
+    private String surname;
+    private String phoneNumber;
+    private String email;
+    private String password;
+
+    public User(String name, String surname, String phoneNumber, String email, String password) {
+        this.name = name;
+        this.surname = surname;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
     }
 }

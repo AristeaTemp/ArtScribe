@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Reservation
+comment1.params=dateTime\ price\ museum\ user
+comment1.target=Reservation(java.time.LocalDateTime,\ double,\ Museum,\ User)
+comment2.params=
+comment2.target=java.time.LocalDateTime\ getDateTime()
+comment3.params=
+comment3.target=double\ getPrice()
+comment4.params=
+comment4.target=Museum\ getMuseum()
+comment5.params=
+comment5.target=User\ getUser()
+comment6.params=dateTime
+comment6.target=void\ setDateTime(java.time.LocalDateTime)
+comment7.params=price
+comment7.target=void\ setPrice(double)
+comment8.params=museum
+comment8.target=void\ setMuseum(Museum)
+comment9.params=user
+comment9.target=void\ setUser(User)
+numComments=10

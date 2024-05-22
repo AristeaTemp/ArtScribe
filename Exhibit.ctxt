@@ -1,0 +1,17 @@
+#BlueJ class context
+comment0.target=Exhibit
+comment1.params=number\ description\ museum
+comment1.target=Exhibit(int,\ java.lang.String,\ Museum)
+comment2.params=
+comment2.target=int\ getNumber()
+comment3.params=
+comment3.target=java.lang.String\ getDescription()
+comment4.params=
+comment4.target=Museum\ getMuseum()
+comment5.params=number
+comment5.target=void\ setNumber(int)
+comment6.params=description
+comment6.target=void\ setDescription(java.lang.String)
+comment7.params=museum
+comment7.target=void\ setMuseum(Museum)
+numComments=8
