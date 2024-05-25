@@ -1,5 +1,7 @@
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
 
 public class City {
     private String name;
@@ -11,22 +13,17 @@ public class City {
         this.museums = new ArrayList<>();
     }
 
-    // Add a museum to the city
-    public void addMuseum(Museum museum) {
-        if (!museums.contains(museum)) {
-            museums.add(museum);
-            System.out.println(museum.getName() + " has been added to " + this.name);
-        } else {
-            System.out.println("This museum is already registered in " + this.name);
-        }
-    }
-
-    // Remove a museum from the city
-    public void removeMuseum(Museum museum) {
-        if (museums.remove(museum)) {
-            System.out.println(museum.getName() + " has been removed from " + this.name);
-        } else {
-            System.out.println("This museum was not found in " + this.name);
+    // Check if the city exists in the database
+    public static boolean cityExists(String cityName) {
+        String query = "SELECT * FROM Cities WHERE Name = ?";
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, cityName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next(); // Returns true if city exists, false otherwise
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
