@@ -34,9 +34,18 @@ public class Reservation {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                // Simulate database operation for making a reservation
-                // You would typically perform database operations here
-                // For demonstration, let's just print the reservation details
+               String insertQuery = "INSERT INTO Reservations (DateTime, Price, MuseumId, UserId) VALUES (?, ?, ?, ?)";
+try (Connection connection = DriverManager.getConnection(DB_URL);
+     PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+    preparedStatement.setTimestamp(1, Timestamp.valueOf(dateTime));
+    preparedStatement.setDouble(2, price);
+    preparedStatement.setInt(3, museum.getId());
+    preparedStatement.setInt(4, user.getId());
+    preparedStatement.executeUpdate();
+    System.out.println("Reservation saved for user: " + user.getName());
+} catch (SQLException e) {
+    e.printStackTrace();
+}
                 System.out.println("Making a reservation for user: " + user.getName() +
                                    ", Museum: " + museum.getName() +
                                    ", Date and Time: " + dateTime.toString() +
