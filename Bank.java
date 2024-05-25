@@ -1,19 +1,49 @@
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
 
 public class Bank {
-    private Map<Integer, Transaction> transactions;  // Map to store transaction details by transaction ID
+    private static final String DB_URL = "jdbc:sqlite:/absolute/path/to/artscribe.db";
+    private Map<Integer, Transaction> transactions;
 
     public Bank() {
         this.transactions = new HashMap<>();
     }
 
-    // Simulate processing a payment
     public boolean processPayment(User user, double amount) {
         if (verifyPaymentDetails(user.getPaymentDetails())) {
-            Transaction newTransaction = new Transaction(user, amount);
-            transactions.put(newTransaction.getId(), newTransaction);
-            System.out.println("Payment processed for user: " + user.getName() + ", Amount: $" + amount);
+            SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+                @Override
+                protected Boolean doInBackground() throws Exception {
+                    try (Connection connection = DriverManager.getConnection(DB_URL)) {
+                        String insertQuery = "INSERT INTO Transactions (UserId, Amount) VALUES (?, ?)";
+                        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                            preparedStatement.setInt(1, user.getId());
+                            preparedStatement.setDouble(2, amount);
+                            preparedStatement.executeUpdate();
+                        }
+                        return true;
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        if (get()) {
+                            System.out.println("Payment processed for user: " + user.getName() + ", Amount: $" + amount);
+                        } else {
+                            System.out.println("Payment failed: Unable to process transaction.");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            worker.execute();
             return true;
         } else {
             System.out.println("Payment failed: Invalid payment details.");
@@ -21,40 +51,12 @@ public class Bank {
         }
     }
 
-    // Simulate verifying payment details
     private boolean verifyPaymentDetails(String paymentDetails) {
-        // Here, you would implement real validation logic
+        // Implement real validation logic
         return paymentDetails != null && !paymentDetails.isEmpty();
     }
 
-    // Retrieve a transaction by ID
     public Transaction getTransactionById(int transactionId) {
         return transactions.get(transactionId);
-    }
-}
-
-// Supporting Transaction class to represent each transaction
-class Transaction {
-    private static int nextId = 1;
-    private int id;
-    private User user;
-    private double amount;
-
-    public Transaction(User user, double amount) {
-        this.id = nextId++;
-        this.user = user;
-        this.amount = amount;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public double getAmount() {
-        return amount;
     }
 }
