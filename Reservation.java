@@ -1,5 +1,5 @@
 import java.time.LocalDateTime;
-import java.util.Set;
+import javax.swing.*;
 
 public class Reservation {
     private LocalDateTime dateTime;
@@ -7,7 +7,6 @@ public class Reservation {
     private Museum museum;
     private User user;
 
-    // Constructor
     public Reservation(LocalDateTime dateTime, double price, Museum museum, User user) {
         this.dateTime = dateTime;
         this.price = price;
@@ -15,7 +14,6 @@ public class Reservation {
         this.user = user;
     }
 
-    // Getters
     public LocalDateTime getDateTime() {
         return dateTime;
     }
@@ -32,20 +30,23 @@ public class Reservation {
         return user;
     }
 
-    // Setters
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public void setMuseum(Museum museum) {
-        this.museum = museum;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void makeReservationAsync() {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                // Simulate database operation for making a reservation
+                // You would typically perform database operations here
+                // For demonstration, let's just print the reservation details
+                System.out.println("Making a reservation for user: " + user.getName() +
+                                   ", Museum: " + museum.getName() +
+                                   ", Date and Time: " + dateTime.toString() +
+                                   ", Price: $" + price);
+                // Simulate saving the reservation in the user's reservations
+                user.addReservation(Reservation.this); // Add this reservation to the user's reservations
+                System.out.println("Reservation saved for user: " + user.getName());
+                return null;
+            }
+        };
+        worker.execute();
     }
 }
