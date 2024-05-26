@@ -1,151 +1,233 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Scanner;
-import javax.swing.SwingWorker;
 
-public class Menu {
+public class Menu extends JFrame {
     private static HashMap<String, User> users = new HashMap<>();
     private static User loggedInUser = null;
 
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int choice = 0;
-        while (choice != 6) {
-            System.out.println("Select an option: ");
-            System.out.println("1. Register");
-            System.out.println("2. Login");
-            System.out.println("3. Select City");
-            System.out.println("4. Scan QR Code");
-            System.out.println("5. Make Reservation");
-            System.out.println("6. Quit");
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            switch (choice) {
-                case 1:
-                    registerUser(scanner);
-                    break;
-                case 2:
-                    loginUser(scanner);
-                    break;
-                case 3:
-                    if (loggedInUser != null) {
-                        selectCity(scanner);
-                    } else {
-                        System.out.println("Please login first.");
-                    }
-                    break;
-                case 4:
-                    if (loggedInUser != null) {
-                        scanQRCode(scanner);
-                    } else {
-                        System.out.println("Please login first.");
-                    }
-                    break;
-                case 5:
-                    if (loggedInUser != null) {
-                        makeReservation(scanner);
-                    } else {
-                        System.out.println("Please login first.");
-                    }
-                    break;
-                case 6:
-                    System.out.println("Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid choice");
+    private JTextField nameField;
+    private JTextField surnameField;
+    private JTextField phoneField;
+    private JTextField emailField;
+    private JPasswordField passwordField;
+    private JTextField cityField;
+    private JTextField qrCodeField;
+    private JTextField exhibitNumberField;
+    private JTextField museumNameField;
+    private JTextField dateTimeField;
+    private JTextField priceField;
+
+    public Menu() {
+        setTitle("Menu");
+        setSize(400, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(6, 1));
+
+        JButton registerButton = new JButton("Register");
+        JButton loginButton = new JButton("Login");
+        JButton selectCityButton = new JButton("Select City");
+        JButton scanQRButton = new JButton("Scan QR Code");
+        JButton makeReservationButton = new JButton("Make Reservation");
+        JButton quitButton = new JButton("Quit");
+
+        panel.add(registerButton);
+        panel.add(loginButton);
+        panel.add(selectCityButton);
+        panel.add(scanQRButton);
+        panel.add(makeReservationButton);
+        panel.add(quitButton);
+
+        add(panel);
+
+        registerButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                registerUser();
+            }
+        });
+
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                loginUser();
+            }
+        });
+
+        selectCityButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (loggedInUser != null) {
+                    selectCity();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please login first.");
+                }
+            }
+        });
+
+        scanQRButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (loggedInUser != null) {
+                    scanQRCode();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please login first.");
+                }
+            }
+        });
+
+        makeReservationButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (loggedInUser != null) {
+                    makeReservation();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please login first.");
+                }
+            }
+        });
+
+        quitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    private void registerUser() {
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        nameField = new JTextField();
+        surnameField = new JTextField();
+        phoneField = new JTextField();
+        emailField = new JTextField();
+        passwordField = new JPasswordField();
+
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Surname:"));
+        panel.add(surnameField);
+        panel.add(new JLabel("Phone:"));
+        panel.add(phoneField);
+        panel.add(new JLabel("Email:"));
+        panel.add(emailField);
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Register", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String name = nameField.getText();
+            String surname = surnameField.getText();
+            String phoneNumber = phoneField.getText();
+            String email = emailField.getText();
+            String password = new String(passwordField.getPassword());
+
+            if (users.containsKey(email)) {
+                JOptionPane.showMessageDialog(null, "User already exists.");
+            } else {
+                User user = new User(name, surname, phoneNumber, email, password);
+                users.put(email, user);
+                JOptionPane.showMessageDialog(null, "Registration successful.");
             }
         }
-        scanner.close();
     }
 
-    static void registerUser(Scanner scanner) {
-        System.out.println("Enter your name:");
-        String name = scanner.nextLine();
-        System.out.println("Enter your surname:");
-        String surname = scanner.nextLine();
-        System.out.println("Enter your phone number:");
-        String phoneNumber = scanner.nextLine();
-        System.out.println("Enter your email:");
-        String email = scanner.nextLine();
-        System.out.println("Enter your password:");
-        String password = scanner.nextLine();
+    private void loginUser() {
+        JPanel panel = new JPanel(new GridLayout(2, 2));
+        emailField = new JTextField();
+        passwordField = new JPasswordField();
 
-        if (users.containsKey(email)) {
-            System.out.println("User already exists.");
-        } else {
-            User user = new User(name, surname, phoneNumber, email, password);
-            users.put(email, user);
-            System.out.println("Registration successful.");
+        panel.add(new JLabel("Email:"));
+        panel.add(emailField);
+        panel.add(new JLabel("Password:"));
+        panel.add(passwordField);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String email = emailField.getText();
+            String password = new String(passwordField.getPassword());
+
+            User user = users.get(email);
+            if (user != null && user.getPassword().equals(password)) {
+                loggedInUser = user;
+                JOptionPane.showMessageDialog(null, "Login successful. Welcome, " + user.getName() + " " + user.getSurname());
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid email or password.");
+            }
         }
     }
 
-    static void loginUser(Scanner scanner) {
-        System.out.println("Enter your email:");
-        String email = scanner.nextLine();
-        System.out.println("Enter your password:");
-        String password = scanner.nextLine();
-
-        User user = users.get(email);
-        if (user != null && user.getPassword().equals(password)) {
-            loggedInUser = user;
-            System.out.println("Login successful.");
-            System.out.println("Welcome, " + user.getName() + " " + user.getSurname());
-        } else {
-            System.out.println("Invalid email or password.");
+    private void selectCity() {
+        String city = JOptionPane.showInputDialog("Enter your city:");
+        if (city != null && !city.trim().isEmpty()) {
+            loggedInUser.setCity(city);
+            JOptionPane.showMessageDialog(null, "City selected: " + city);
         }
     }
 
-    static void selectCity(Scanner scanner) {
-        System.out.println("Enter your city:");
-        String city = scanner.nextLine();
-        loggedInUser.setCity(city);
-        System.out.println("City selected: " + city);
-    }
+    private void scanQRCode() {
+        JPanel panel = new JPanel(new GridLayout(2, 2));
+        qrCodeField = new JTextField();
+        exhibitNumberField = new JTextField();
 
-    static void scanQRCode(Scanner scanner) {
-        System.out.println("Enter the QR code data:");
-        String codeData = scanner.nextLine();
-        System.out.println("Enter the exhibit number:");
-        int exhibitNumber = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        panel.add(new JLabel("QR Code Data:"));
+        panel.add(qrCodeField);
+        panel.add(new JLabel("Exhibit Number:"));
+        panel.add(exhibitNumberField);
 
-        Exhibit exhibit = getExhibitByNumber(exhibitNumber);
-        if (exhibit != null) {
-            SwingWorker<Void, Void> worker = new SwingWorker<>() {
-                @Override
-                protected Void doInBackground() {
-                    // Simulate scanning QR code
-                    ScanQR scanQR = new ScanQR(loggedInUser);
-                    scanQR.scanCode(codeData, exhibit);
-                    return null;
-                }
+        int result = JOptionPane.showConfirmDialog(null, panel, "Scan QR Code", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String codeData = qrCodeField.getText();
+            int exhibitNumber = Integer.parseInt(exhibitNumberField.getText());
 
-                @Override
-                protected void done() {
-                    System.out.println("QR code scanned successfully.");
-                }
-            };
-            worker.execute();
-        } else {
-            System.out.println("Exhibit not found.");
+            Exhibit exhibit = getExhibitByNumber(exhibitNumber);
+            if (exhibit != null) {
+                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected Void doInBackground() {
+                        ScanQR scanQR = new ScanQR(loggedInUser);
+                        scanQR.scanCode(codeData, exhibit);
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        JOptionPane.showMessageDialog(null, "QR code scanned successfully.");
+                    }
+                };
+                worker.execute();
+            } else {
+                JOptionPane.showMessageDialog(null, "Exhibit not found.");
+            }
         }
     }
 
-    static void makeReservation(Scanner scanner) {
-        System.out.println("Enter the museum name:");
-        String museumName = scanner.nextLine();
-        Museum museum = getMuseumByName(museumName);
-        if (museum != null) {
-            System.out.println("Enter the reservation date and time (YYYY-MM-DD HH:MM):");
-            String dateTime = scanner.nextLine();
-            System.out.println("Enter the price:");
-            double price = scanner.nextDouble();
-            scanner.nextLine(); // Consume newline
+    private void makeReservation() {
+        JPanel panel = new JPanel(new GridLayout(3, 2));
+        museumNameField = new JTextField();
+        dateTimeField = new JTextField();
+        priceField = new JTextField();
 
-            Reservation reservation = new Reservation(dateTime, price, museum, loggedInUser);
-            reservation.makeReservation();
-            System.out.println("Reservation successful.");
-        } else {
-            System.out.println("Museum not found.");
+        panel.add(new JLabel("Museum Name:"));
+        panel.add(museumNameField);
+        panel.add(new JLabel("Reservation Date and Time (YYYY-MM-DD HH:MM):"));
+        panel.add(dateTimeField);
+        panel.add(new JLabel("Price:"));
+        panel.add(priceField);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Make Reservation", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            String museumName = museumNameField.getText();
+            String dateTime = dateTimeField.getText();
+            double price = Double.parseDouble(priceField.getText());
+
+            Museum museum = getMuseumByName(museumName);
+            if (museum != null) {
+                Reservation reservation = new Reservation(dateTime, price, museum, loggedInUser);
+                reservation.makeReservation();
+                JOptionPane.showMessageDialog(null, "Reservation successful.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Museum not found.");
+            }
         }
     }
 
@@ -156,6 +238,14 @@ public class Menu {
 
     static Museum getMuseumByName(String museumName) {
         return new Museum(museumName);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new Menu().setVisible(true);
+            }
+        });
     }
 }
 
@@ -213,7 +303,7 @@ class ScanQR {
     }
 
     public void scanCode(String codeData, Exhibit exhibit) {
-        
+        // Simulate scanning QR code
         System.out.println("User " + user.getName() + " scanned QR code for exhibit " + exhibit.getDescription());
     }
 }
