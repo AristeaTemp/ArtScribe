@@ -18,7 +18,7 @@ public class Menu {
             System.out.println("5. Make Reservation");
             System.out.println("6. Quit");
             choice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine(); // Consume newline
             switch (choice) {
                 case 1:
                     registerUser(scanner);
@@ -68,13 +68,11 @@ public class Menu {
         String email = scanner.nextLine();
         System.out.println("Enter your password:");
         String password = scanner.nextLine();
-        System.out.println("Enter your payment details:");
-        String paymentDetails = scanner.nextLine();
 
         if (users.containsKey(email)) {
             System.out.println("User already exists.");
         } else {
-            User user = new User(name, surname, phoneNumber, email, password, paymentDetails);
+            User user = new User(name, surname, phoneNumber, email, password);
             users.put(email, user);
             System.out.println("Registration successful.");
         }
@@ -115,7 +113,7 @@ public class Menu {
             SwingWorker<Void, Void> worker = new SwingWorker<>() {
                 @Override
                 protected Void doInBackground() {
-                    
+                    // Simulate scanning QR code
                     ScanQR scanQR = new ScanQR(loggedInUser);
                     scanQR.scanCode(codeData, exhibit);
                     return null;
@@ -167,16 +165,14 @@ class User {
     private String phoneNumber;
     private String email;
     private String password;
-    private String paymentDetails;
     private String city;
 
-    public User(String name, String surname, String phoneNumber, String email, String password, String paymentDetails) {
+    public User(String name, String surname, String phoneNumber, String email, String password) {
         this.name = name;
         this.surname = surname;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
-        this.paymentDetails = paymentDetails;
         this.city = "";
     }
 
@@ -200,10 +196,6 @@ class User {
         return password;
     }
 
-    public String getPaymentDetails() {
-        return paymentDetails;
-    }
-
     public String getCity() {
         return city;
     }
@@ -221,7 +213,7 @@ class ScanQR {
     }
 
     public void scanCode(String codeData, Exhibit exhibit) {
-        // Simulate scanning QR code
+        
         System.out.println("User " + user.getName() + " scanned QR code for exhibit " + exhibit.getDescription());
     }
 }
