@@ -1,4 +1,6 @@
 import javax.swing.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class User {
     private String name;
@@ -6,6 +8,7 @@ public class User {
     private String phoneNumber;
     private String email;
     private String password;
+    private List<String> bookings;
 
     // Constructor
     public User(String name, String surname, String phoneNumber, String email, String password) {
@@ -14,6 +17,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.password = password;
+        this.bookings = new ArrayList<>();  // Initialize the bookings list
     }
 
     // Getters and setters
@@ -57,25 +61,48 @@ public class User {
         this.password = password;
     }
 
-    // Method to display user details
-    public void displayDetails() {
-        System.out.println("Name: " + name);
-        System.out.println("Surname: " + surname);
-        System.out.println("Phone Number: " + phoneNumber);
-        System.out.println("Email: " + email);
+    public List<String> getBookings() {
+        return bookings;
     }
 
-    // Method to change phone number
+    public void addBooking(String booking) {
+        this.bookings.add(booking);
+    }
+
+    // Method to change phone number using SwingWorker
     public void changePhoneNumber(String newPhoneNumber) {
-        this.phoneNumber = newPhoneNumber;
-        System.out.println("Phone number changed to: " + newPhoneNumber);
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                // Simulate some background work
+                Thread.sleep(2000); // Simulate a delay in updating phone number
+                phoneNumber = newPhoneNumber;
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    get(); // Retrieve the result of doInBackground() method
+                    JOptionPane.showMessageDialog(null, "Phone number updated successfully!");
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Error updating phone number: " + e.getMessage());
+                }
+            }
+        };
+
+        worker.execute();
     }
 
     public static void main(String[] args) {
-        // Example usage
-        User user = new User("John", "Doe", "1234567890", "john@example.com", "password");
-        user.displayDetails();
+        User user = new User("John", "Doe", "1234567890", "john.doe@example.com", "password123");
+        user.addBooking("Booking 1");
+        user.addBooking("Booking 2");
+
+        // Display bookings
+        System.out.println("Bookings: " + user.getBookings());
+
+        // Change phone number
         user.changePhoneNumber("0987654321");
-        user.displayDetails();
     }
 }
