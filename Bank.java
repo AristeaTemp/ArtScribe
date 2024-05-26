@@ -1,62 +1,81 @@
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.*;
 
 public class Bank {
-    private static final String DB_URL = "jdbc:sqlite:/absolute/path/to/artscribe.db";
-    private Map<Integer, Transaction> transactions;
+    private static final String DB_URL = "jdbc:sqlite:C:/Users/Αριστέα/OneDrive/Desktop/ArtScribe.db";
 
-    public Bank() {
-        this.transactions = new HashMap<>();
-    }
-
-    public boolean processPayment(User user, double amount) {
-        if (verifyPaymentDetails(user.getPaymentDetails())) {
-            SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
-                @Override
-                protected Boolean doInBackground() throws Exception {
-                    try (Connection connection = DriverManager.getConnection(DB_URL)) {
-                        String insertQuery = "INSERT INTO Transactions (UserId, Amount) VALUES (?, ?)";
-                        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-                            preparedStatement.setInt(1, user.getId());
-                            preparedStatement.setDouble(2, amount);
-                            preparedStatement.executeUpdate();
-                        }
-                        return true;
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                        return false;
-                    }
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        if (get()) {
-                            System.out.println("Payment processed for user: " + user.getName() + ", Amount: $" + amount);
-                        } else {
-                            System.out.println("Payment failed: Unable to process transaction.");
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            worker.execute();
-            return true;
-        } else {
-            System.out.println("Payment failed: Invalid payment details.");
+    public boolean processReservation(User user, double amount, String cardNumber, String expirationDate, String cardName, String cvv) {
+        if (!verifyCreditCard(user, cardNumber, expirationDate, cardName, cvv)) {
+            System.out.println("Reservation failed: Credit card verification failed.");
             return false;
         }
+        
+        double userBalance = getUserBalance(user.getId());
+        if (userBalance < amount) {
+            System.out.println("Reservation failed: Insufficient balance.");
+            return false;
+        }
+
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
+            protected Boolean doInBackground() {
+                try (Connection connection = DriverManager.getConnection(DB_URL)) {
+                    String insertQuery = "INSERT INTO Transactions (UserId, Amount) VALUES (?, ?)";
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                        preparedStatement.setInt(1, user.getId());
+                        preparedStatement.setDouble(2, amount);
+                        preparedStatement.executeUpdate();
+                    }
+                    return true;
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+
+            protected void done() {
+                try {
+                    if (get()) {
+                        System.out.println("Reservation successful for user: " + user.getName() + ", Amount: $" + amount);
+                    } else {
+                        System.out.println("Reservation failed: Unable to process transaction.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
+        return true;
     }
 
-    private boolean verifyPaymentDetails(String paymentDetails) {
-        // Implement real validation logic
-        return paymentDetails != null && !paymentDetails.isEmpty();
+
+    private boolean verifyCreditCard(User user, String cardNumber, String expirationDate, String cardName, String cvv) {
+
+        return true;
     }
 
-    public Transaction getTransactionById(int transactionId) {
-        return transactions.get(transactionId);
+    private double getUserBalance(int userId) {
+        
+        return 1000.0;
+    }
+
+    private static class User {
+        private int id;
+        private String name;
+
+        public User(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }
+
+   
