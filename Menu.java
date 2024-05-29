@@ -1,6 +1,3 @@
-
-package net.codejava;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,8 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 
-
-
 public class Menu extends JFrame {
     private JTextField nameField;
     private JTextField surnameField;
@@ -21,8 +16,7 @@ public class Menu extends JFrame {
     private JPasswordField passwordField;
 
     static Connection dbConnection = null;
-    
-    
+
     private void displayInitialMenu() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(2, 1));
@@ -36,21 +30,19 @@ public class Menu extends JFrame {
         registerButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 registerUser();
-                displayMainMenu();
             }
         });
 
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loginUser();
-                displayMainMenu();
             }
         });
 
         JOptionPane.showOptionDialog(null, panel, "Welcome", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }
 
-    private void displayMainMenu() {
+    private void displayMainMenu(User user) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(8, 1));
 
@@ -72,7 +64,7 @@ public class Menu extends JFrame {
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showProfile();
+                showProfile(user);
             }
         });
 
@@ -115,12 +107,10 @@ public class Menu extends JFrame {
         JOptionPane.showOptionDialog(null, panel, "Main Menu", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }
 
-    
-
     public static boolean establishConnection() {
         try {
             System.out.println("Connecting to database...");
-            dbConnection = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db");
+            dbConnection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db");
             System.out.println("Connected to database...");
             return true;
         } catch (SQLException e) {
@@ -156,7 +146,7 @@ public class Menu extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db")) {
                 String sql = "INSERT INTO User (Name, Surname, Phone, Email, Password) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, name);
@@ -173,7 +163,7 @@ public class Menu extends JFrame {
             }
         }
     }
-    
+
     private void loginUser() {
         JPanel panel = new JPanel(new GridLayout(2, 2));
         emailField = new JTextField();
@@ -189,7 +179,7 @@ public class Menu extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db")) {
                 String sql = "SELECT * FROM User WHERE Email = ? AND Password = ?";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, email);
@@ -198,7 +188,15 @@ public class Menu extends JFrame {
                 if (rs.next()) {
                     String name = rs.getString("Name");
                     String surname = rs.getString("Surname");
+                    String phoneNumber = rs.getString("Phone");
+                    String emailFromDB = rs.getString("Email");
+                    String passwordFromDB = rs.getString("Password");
+
+                    User user = new User(name, surname, phoneNumber, emailFromDB, passwordFromDB);
+
                     JOptionPane.showMessageDialog(null, "Login successful. Welcome, " + name + " " + surname);
+
+                    displayMainMenu(user);
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.");
                 }
@@ -208,15 +206,82 @@ public class Menu extends JFrame {
         }
     }
 
+    private void showProfile(User user) {
+        JPanel panel = new JPanel(new GridLayout(4, 2));
+        nameField = new JTextField(user.getName());
+        surnameField = new JTextField(user.getSurname());
+        phoneField = new JTextField(user.getPhoneNumber());
+        emailField = new JTextField(user.getEmail());
+
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Surname:"));
+        panel.add(surnameField);
+        panel.add(new JLabel("Phone:"));
+        panel.add(phoneField);
+        panel.add(new JLabel("Email:"));
+        panel.add(emailField);
+
+        JButton viewTicketsButton = new JButton("View Tickets");
+        JButton cancelTicketsButton = new JButton("Cancel Tickets");
+
+        panel.add(viewTicketsButton);
+        panel.add(cancelTicketsButton);
+
+        viewTicketsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                viewTickets(user);
+            }
+        });
+
+        cancelTicketsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cancelTickets(user);
+            }
+        });
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Profile - " + user.getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            // Here you can update the user's profile if needed
+            // For example, update the database with new information
+        }
+    }
+
+    private void viewTickets(User user) {
+        // Implement functionality to view tickets for the user
+    }
+
+    private void cancelTickets(User user) {
+        // Implement functionality to cancel tickets for the user
+    }
+
+    private void scanQRCode() {
+        // Implement QR code scanning functionality
+    }
+
+    private void searchMuseumsByCity() {
+        // Implement search by city functionality
+    }
+
+    private void searchMuseumsByKeyword() {
+        // Implement search by keyword functionality
+    }
+
+    private void onlineReservation() {
+        // Implement online reservation functionality
+    }
+
+    private void checkTraffic() {
+        // Implement traffic checking functionality
+    }
+
     public static void main(String[] args) {
         if (establishConnection()) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    new Menu().displayInitialMenu();
-                }
-            });
+            Menu menu = new Menu();
+            menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            menu.displayInitialMenu();
+        } else {
+            System.out.println("Failed to establish database connection.");
         }
     }
 }
-
-               
