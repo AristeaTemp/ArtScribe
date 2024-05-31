@@ -1,3 +1,5 @@
+package net.codejava;
+
 public class Exhibit {
     private int number;
     private String description;
