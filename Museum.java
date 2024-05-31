@@ -1,27 +1,112 @@
+
+package net.codejava;
+
 import java.sql.*;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Museum {
-    private static final String DB_URL = "jdbc:sqlite:C:/Users/despina/Desktop/ceid/tl/tl2/artscribe.db";
-
-    private String name;
+    private static final String DB_URL = "jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db";
+    
+    private String museumName;
     private String workHours;
     private String address;
     private String category;
     private double ticketPrice;
     private String keyWord;
+    private String TrafficInfo;
 
-    public Museum(String name, String workHours, String address, String category, double ticketPrice, String keyWord) {
-        this.name = name;
+    public Museum(String museumName, String workHours, String address, String category, double ticketPrice, String keyWord,String TrafficInfo) {
+        this.museumName = museumName;
         this.workHours = workHours;
         this.address = address;
         this.category = category;
         this.ticketPrice = ticketPrice;
         this.keyWord = keyWord;
+        this.TrafficInfo = TrafficInfo;
     }
 
-    public String getName() {
-        return name;
+ 
+    public static Museum getMuseumByNameFromDatabase(String museumName) {
+        Museum museum = null;
+        String query = "SELECT * FROM Museum WHERE name = ?";
+        try (Connection connection = DriverManager.getConnection(DB_URL);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, museumName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String workHours = resultSet.getString("work_hours");
+                String address = resultSet.getString("address");
+                String category = resultSet.getString("category");
+                double ticketPrice = resultSet.getDouble("ticket_price");
+                String keyWord = resultSet.getString("key_word");
+                String trafficInfo = resultSet.getString("traffic_info");
+
+                museum = new Museum(museumName, workHours, address, category, ticketPrice, keyWord, trafficInfo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return museum;
+    }
+
+
+    public static List<Museum> getMuseumsByKeywordFromDatabase(String keyword) {
+        List<Museum> museums = new ArrayList<>();
+        String query = "SELECT * FROM Museum WHERE key_word LIKE ?";
+
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, "%" + keyword + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String museumName = resultSet.getString("name");
+                String workHours = resultSet.getString("work_hours");
+                String address = resultSet.getString("address");
+                String category = resultSet.getString("category");
+                double ticketPrice = resultSet.getDouble("ticket_price");
+                String keyWord = resultSet.getString("key_word");
+                String TrafficInfo = resultSet.getString("TrafficInfo");
+
+                Museum museum = new Museum(museumName, workHours, address, category, ticketPrice, keyWord,TrafficInfo);
+                museums.add(museum);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return museums;
+    }
+
+    private Museum getMuseumById(int museumId) {
+        Museum museum = null;
+        try {
+            Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+            String sql = "SELECT * FROM Museum WHERE Id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setInt(1, museumId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                // Retrieve museum details from the database
+                String name = rs.getString("Name");
+                String workHours = rs.getString("WorkHours");
+                String address = rs.getString("Address");
+                String category = rs.getString("Category");
+                double ticketPrice = rs.getDouble("TicketPrice");
+                String keyWord = rs.getString("KeyWord");
+                museum = new Museum(museumName, workHours, address, category, ticketPrice, keyWord,TrafficInfo);
+            }
+            con.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return museum;
+    }
+    
+    // Getters and setters
+    public String getMuseumName() {
+        return museumName;
     }
 
     public String getWorkHours() {
@@ -44,8 +129,8 @@ public class Museum {
         return keyWord;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMuseumName(String museumName) {
+        this.museumName = museumName;
     }
 
     public void setWorkHours(String workHours) {
@@ -67,150 +152,13 @@ public class Museum {
     public void setKeyWord(String keyWord) {
         this.keyWord = keyWord;
     }
-
-    public static void addMuseum(Museum museum) {
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
-            String insertQuery = "INSERT INTO Museum (name, work_hours, address, category, ticket_price, key_word) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-                preparedStatement.setString(1, museum.getName());
-                preparedStatement.setString(2, museum.getWorkHours());
-                preparedStatement.setString(3, museum.getAddress());
-                preparedStatement.setString(4, museum.getCategory());
-                preparedStatement.setDouble(5, museum.getTicketPrice());
-                preparedStatement.setString(6, museum.getKeyWord());
-
-                preparedStatement.executeUpdate();
-                System.out.println("Museum added successfully.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public String getTrafficInfo() {
+        return TrafficInfo;
     }
 
-    public static void viewMuseums() {
-        try (Connection connection = DriverManager.getConnection(DB_URL)) {
-            String query = "SELECT * FROM Museum";
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery(query);
-                System.out.println("Museums in the database:");
-                while (resultSet.next()) {
-                    String name = resultSet.getString("name");
-                    String workHours = resultSet.getString("work_hours");
-                    String address = resultSet.getString("address");
-                    String category = resultSet.getString("category");
-                    double ticketPrice = resultSet.getDouble("ticket_price");
-                    String keyWord = resultSet.getString("key_word");
-                    System.out.println("Name: " + name + ", Work Hours: " + workHours + ", Address: " + address + ", Category: " + category + ", Ticket Price: " + ticketPrice + ", Key Word: " + keyWord);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public void setTrafficInfo(String TrafficInfo) {
+    	this.TrafficInfo = TrafficInfo;
     }
-
-    public static void createAndShowGUI() {
-        JFrame frame = new JFrame("Museum Management");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        JPanel panel = new JPanel();
-        frame.getContentPane().add(panel);
-
-        JButton addMuseumButton = new JButton("Add Museum");
-        JButton viewMuseumsButton = new JButton("View Museums");
-
-        panel.add(addMuseumButton);
-        panel.add(viewMuseumsButton);
-
-        addMuseumButton.addActionListener(e -> addMuseumGUI());
-        viewMuseumsButton.addActionListener(e -> viewMuseumsGUI());
-
-        frame.pack();
-        frame.setVisible(true);
-    }
-
-    private static void addMuseumGUI() {
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                JTextField nameField = new JTextField(10);
-                JTextField workHoursField = new JTextField(10);
-                JTextField addressField = new JTextField(10);
-                JTextField categoryField = new JTextField(10);
-                JTextField ticketPriceField = new JTextField(10);
-                JTextField keyWordField = new JTextField(10);
-
-                JPanel myPanel = new JPanel();
-                myPanel.add(new JLabel("Name:"));
-                myPanel.add(nameField);
-                myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-                myPanel.add(new JLabel("Work Hours:"));
-                myPanel.add(workHoursField);
-                myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-                myPanel.add(new JLabel("Address:"));
-                myPanel.add(addressField);
-                myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-                myPanel.add(new JLabel("Category:"));
-                myPanel.add(categoryField);
-                myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-                myPanel.add(new JLabel("Ticket Price:"));
-                myPanel.add(ticketPriceField);
-                myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-                myPanel.add(new JLabel("Key Word:"));
-                myPanel.add(keyWordField);
-
-                int result = JOptionPane.showConfirmDialog(null, myPanel, 
-                         "Please Enter Museum Details", JOptionPane.OK_CANCEL_OPTION);
-                if (result == JOptionPane.OK_OPTION) {
-                    String name = nameField.getText();
-                    String workHours = workHoursField.getText();
-                    String address = addressField.getText();
-                    String category = categoryField.getText();
-                    double ticketPrice = Double.parseDouble(ticketPriceField.getText());
-                    String keyWord = keyWordField.getText();
-
-                    Museum museum = new Museum(name, workHours, address, category, ticketPrice, keyWord);
-                    Museum.addMuseum(museum);
-                }
-                return null;
-            }
-        };
-
-        worker.execute();
-    }
-
-    private static void viewMuseumsGUI() {
-        SwingWorker<Void, Void> worker = new SwingWorker<>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try (Connection connection = DriverManager.getConnection(DB_URL)) {
-                    String query = "SELECT * FROM Museum";
-                    try (Statement statement = connection.createStatement()) {
-                        ResultSet resultSet = statement.executeQuery(query);
-                        StringBuilder museumsList = new StringBuilder("Museums in the database:\n");
-                        while (resultSet.next()) {
-                            String name = resultSet.getString("name");
-                            String workHours = resultSet.getString("work_hours");
-                            String address = resultSet.getString("address");
-                            String category = resultSet.getString("category");
-                            double ticketPrice = resultSet.getDouble("ticket_price");
-                            String keyWord = resultSet.getString("key_word");
-                            museumsList.append("Name: ").append(name)
-                                    .append(", Work Hours: ").append(workHours)
-                                    .append(", Address: ").append(address)
-                                    .append(", Category: ").append(category)
-                                    .append(", Ticket Price: ").append(ticketPrice)
-                                    .append(", Key Word: ").append(keyWord)
-                                    .append("\n");
-                        }
-                        JOptionPane.showMessageDialog(null, museumsList.toString());
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-        };
-
-        worker.execute();
-    }
+    
+    
 }
