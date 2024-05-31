@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Menu extends JFrame {
@@ -123,7 +124,7 @@ public class Menu extends JFrame {
     public static boolean establishConnection() {
         try {
             System.out.println("Connecting to database...");
-            dbConnection = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db");
+            dbConnection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
             dbConnection.createStatement().execute("PRAGMA busy_timeout = 5000");
             System.out.println("Connected to database...");
             return true;
@@ -156,16 +157,16 @@ public class Menu extends JFrame {
         if (result == JOptionPane.OK_OPTION) {
             String name = nameField.getText();
             String surname = surnameField.getText();
-            String phoneNumber = phoneField.getText();
+            String phone = phoneField.getText();
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db")) {
                 String sql = "INSERT INTO User (Name, Surname, Phone, Email, Password) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, name);
                 stmt.setString(2, surname);
-                stmt.setString(3, phoneNumber);
+                stmt.setString(3, phone);
                 stmt.setString(4, email);
                 stmt.setString(5, password);
                 int rowsInserted = stmt.executeUpdate();
@@ -193,7 +194,7 @@ public class Menu extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db")) {
                 String sql = "SELECT * FROM User WHERE Email = ? AND Password = ?";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, email);
@@ -218,7 +219,7 @@ public class Menu extends JFrame {
         JPanel panel = new JPanel(new GridLayout(7, 2));
         nameField = new JTextField(user.getName());
         surnameField = new JTextField(user.getSurname());
-        phoneField = new JTextField(user.getPhoneNumber());
+        phoneField = new JTextField(user.getPhone());
         emailField = new JTextField(user.getEmail());
 
         panel.add(new JLabel("Name:"));
@@ -274,7 +275,7 @@ public class Menu extends JFrame {
         } else {
             Connection con = null;
             try {
-                con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db");
+                con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
                 con.createStatement().execute("PRAGMA busy_timeout = 5000"); // Set busy timeout to 5000ms (5 seconds)
 
                 String sql = "UPDATE User SET Name = ?, Surname = ?, Phone = ?, Email = ? WHERE Email = ?";
@@ -334,28 +335,176 @@ public class Menu extends JFrame {
     
 
     private void cancelTickets(User user) {
-        // Implementation of cancel tickets
+        List<Reservation> reservations = user.getReservations();
+        if (reservations.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No tickets found.");
+            return;
+        }
+
+        String[] options = new String[reservations.size()];
+        for (int i = 0; i < reservations.size(); i++) {
+            Reservation reservation = reservations.get(i);
+            options[i] = "Museum: " + reservation.getMuseum().getMuseumName() + ", Date: " + reservation.getDateTime() + ", Price: " + reservation.getPrice();
+        }
+
+        String selectedOption = (String) JOptionPane.showInputDialog(null, "Select a ticket to cancel:", "Cancel Tickets", JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        if (selectedOption != null) {
+            for (Iterator<Reservation> iterator = reservations.iterator(); iterator.hasNext(); ) {
+                Reservation reservation = iterator.next();
+                if (selectedOption.contains(reservation.getMuseum().getMuseumName()) && selectedOption.contains(reservation.getDateTime())) {
+                    iterator.remove();
+                    JOptionPane.showMessageDialog(null, "Ticket canceled:\n" + selectedOption);
+                    break;
+                }
+            }
+        }
     }
+    
 
     private void scanQRCode() {
         // Implementation of scan QR code
     }
 
     private void searchMuseumsByCity() {
-        // Implementation of search museums by city
+        List<City> cities = City.getAllCities();
+        if (cities.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No cities found in the database.");
+            return;
+        }
+
+        String[] cityNames = new String[cities.size()];
+        for (int i = 0; i < cities.size(); i++) {
+            cityNames[i] = cities.get(i).getName();
+        }
+
+        String selectedCity = (String) JOptionPane.showInputDialog(null, "Select a city:", 
+                "City Selection", JOptionPane.QUESTION_MESSAGE, null, cityNames, cityNames[0]);
+
+        if (selectedCity != null && !selectedCity.trim().isEmpty()) {
+            City city = null;
+            for (City c : cities) {
+                if (c.getName().equals(selectedCity)) {
+                    city = c;
+                    break;
+                }
+            }
+            if (city == null) {
+                JOptionPane.showMessageDialog(null, "Selected city not found.");
+                return;
+            }
+
+            List<Museum> museumsInCity = city.getMuseums();
+            if (museumsInCity.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No museums found in " + selectedCity);
+                return;
+            }
+
+            String[] museumNames = new String[museumsInCity.size() + 1];
+            for (int i = 0; i < museumsInCity.size(); i++) {
+                museumNames[i] = museumsInCity.get(i).getMuseumName();
+            }
+            museumNames[museumsInCity.size()] = "Cancel";
+
+            while (true) {
+                int selection = JOptionPane.showOptionDialog(null, "Select a museum", 
+                        "Museums in " + selectedCity, JOptionPane.DEFAULT_OPTION, 
+                        JOptionPane.INFORMATION_MESSAGE, null, museumNames, museumNames[0]);
+
+                if (selection >= 0 && selection < museumsInCity.size()) {
+                    Museum selectedMuseum = museumsInCity.get(selection);
+                    int detailsOption = JOptionPane.showConfirmDialog(null, "Name: " + selectedMuseum.getMuseumName() +
+                                    "\nWork Hours: " + selectedMuseum.getWorkHours() +
+                                    "\nAddress: " + selectedMuseum.getAddress() +
+                                    "\nCategory: " + selectedMuseum.getCategory() +
+                                    "\nTicket Price: " + selectedMuseum.getTicketPrice() +
+                                    "\nKey Word: " + selectedMuseum.getKeyWord(), "Museum Details",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (detailsOption == JOptionPane.NO_OPTION) {
+                        JOptionPane.showMessageDialog(null, "Returning to menu.");
+                        break;
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Returning to menu.");
+                    break;
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No city selected. Returning to menu.");
+        }
     }
 
+         
+
+
     private void searchMuseumsByKeyword() {
-        // Implementation of search museums by keyword
+        String keyword = JOptionPane.showInputDialog("Enter a keyword for the museum:");
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            List<Museum> filteredMuseums = Museum.getMuseumsByKeywordFromDatabase(keyword);
+
+            if (filteredMuseums.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No museums found for the keyword: " + keyword);
+                return;
+            }
+
+            String[] museumNames = new String[filteredMuseums.size() + 1];
+            for (int i = 0; i < filteredMuseums.size(); i++) {
+                museumNames[i] = filteredMuseums.get(i).getMuseumName();
+            }
+            museumNames[filteredMuseums.size()] = "Cancel";
+
+            int selection = JOptionPane.showOptionDialog(null, "Select a museum", "Museums matching keyword: " + keyword, 
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, museumNames, museumNames[0]);
+
+            if (selection >= 0 && selection < filteredMuseums.size()) {
+                Museum selectedMuseum = filteredMuseums.get(selection);
+                int detailsOption = JOptionPane.showConfirmDialog(null, "Name: " + selectedMuseum.getMuseumName() +
+                                "\nWork Hours: " + selectedMuseum.getWorkHours() +
+                                "\nAddress: " + selectedMuseum.getAddress() +
+                                "\nCategory: " + selectedMuseum.getCategory() +
+                                "\nTicket Price: " + selectedMuseum.getTicketPrice() +
+                                "\nKey Word: " + selectedMuseum.getKeyWord(), "Museum Details",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (detailsOption == JOptionPane.YES_OPTION) {
+                    int reservationOption = JOptionPane.showConfirmDialog(null, "Do you want to make a reservation?", "Reservation", JOptionPane.YES_NO_OPTION);
+                    if (reservationOption == JOptionPane.YES_OPTION) {
+                        onlineReservation(); // Using the same reservation method
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Returning to menu.");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Returning to menu.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Returning to menu.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No keyword entered. Returning to menu.");
+        }
     }
+
 
     private void onlineReservation() {
         // Implementation of online reservation
     }
 
     private void checkTraffic() {
-        // Implementation of check traffic
+        String museumName = JOptionPane.showInputDialog("Enter museum name to check traffic:");
+        Museum museum = Museum.getMuseumByNameFromDatabase(museumName);
+        if (museum != null) {
+            // Display traffic information from the database
+            String trafficInfo = museum.getTrafficInfo();
+            if (trafficInfo != null && !trafficInfo.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Traffic information for " + museum.getMuseumName() + ":\n" + trafficInfo);
+            } else {
+                JOptionPane.showMessageDialog(null, "No traffic information available for " + museum.getMuseumName());
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Museum not found.");
+        }
     }
+
 
     public static void main(String[] args) {
         if (establishConnection()) {
