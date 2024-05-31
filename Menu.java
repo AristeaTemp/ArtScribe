@@ -1,3 +1,5 @@
+package net.codejava;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -7,6 +9,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Menu extends JFrame {
     private JTextField nameField;
@@ -119,7 +123,7 @@ public class Menu extends JFrame {
     public static boolean establishConnection() {
         try {
             System.out.println("Connecting to database...");
-            dbConnection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db");
+            dbConnection = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db");
             dbConnection.createStatement().execute("PRAGMA busy_timeout = 5000");
             System.out.println("Connected to database...");
             return true;
@@ -156,7 +160,7 @@ public class Menu extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
                 String sql = "INSERT INTO User (Name, Surname, Phone, Email, Password) VALUES (?, ?, ?, ?, ?)";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, name);
@@ -189,7 +193,7 @@ public class Menu extends JFrame {
             String email = emailField.getText();
             String password = new String(passwordField.getPassword());
 
-            try (Connection con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db")) {
+            try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db")) {
                 String sql = "SELECT * FROM User WHERE Email = ? AND Password = ?";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, email);
@@ -254,7 +258,7 @@ public class Menu extends JFrame {
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Profile - " + user.getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            // updates handled by the updateProfile method
+            // No additional action needed here since updates are handled by the updateProfile method
         }
     }
 
@@ -270,7 +274,7 @@ public class Menu extends JFrame {
         } else {
             Connection con = null;
             try {
-                con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db");
+                con = DriverManager.getConnection("jdbc:sqlite:/C:/Users/Αριστέα/Downloads/artscribe (1).db");
                 con.createStatement().execute("PRAGMA busy_timeout = 5000"); // Set busy timeout to 5000ms (5 seconds)
 
                 String sql = "UPDATE User SET Name = ?, Surname = ?, Phone = ?, Email = ? WHERE Email = ?";
@@ -308,32 +312,49 @@ public class Menu extends JFrame {
     }
 
    
+   
     private void viewTickets(User user) {
-        
+        List<Reservation> reservations = user.getReservations();
+        if (reservations.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No tickets found.");
+            return;
+        }
+
+        StringBuilder ticketDetails = new StringBuilder();
+        for (Reservation reservation : reservations) {
+            ticketDetails.append("Museum: ").append(reservation.getMuseum())
+                         .append(", Date: ").append(reservation.getDateTime())
+                         .append(", Price: ").append(reservation.getPrice())
+                         .append("\n");
+        }
+
+        JOptionPane.showMessageDialog(null, "Your Tickets:\n" + ticketDetails.toString());
     }
 
+    
+
     private void cancelTickets(User user) {
-       
+        // Implementation of cancel tickets
     }
 
     private void scanQRCode() {
-        
+        // Implementation of scan QR code
     }
 
     private void searchMuseumsByCity() {
-        
+        // Implementation of search museums by city
     }
 
     private void searchMuseumsByKeyword() {
-      
+        // Implementation of search museums by keyword
     }
 
     private void onlineReservation() {
-        
+        // Implementation of online reservation
     }
 
     private void checkTraffic() {
-      
+        // Implementation of check traffic
     }
 
     public static void main(String[] args) {
