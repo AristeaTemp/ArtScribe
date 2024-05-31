@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Menu extends JFrame {
     private JTextField nameField;
@@ -15,7 +15,12 @@ public class Menu extends JFrame {
     private JTextField emailField;
     private JPasswordField passwordField;
 
-    static Connection dbConnection = null;
+    private static Connection dbConnection = null;
+    private User loggedInUser = null;
+
+    public Menu() {
+        // Constructor
+    }
 
     private void displayInitialMenu() {
         JPanel panel = new JPanel();
@@ -42,7 +47,7 @@ public class Menu extends JFrame {
         JOptionPane.showOptionDialog(null, panel, "Welcome", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{}, null);
     }
 
-    private void displayMainMenu(User user) {
+    private void displayMainMenu() {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(8, 1));
 
@@ -64,7 +69,11 @@ public class Menu extends JFrame {
 
         profileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showProfile(user);
+                if (loggedInUser != null) {
+                    showProfile(loggedInUser);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please log in first.");
+                }
             }
         });
 
@@ -111,6 +120,7 @@ public class Menu extends JFrame {
         try {
             System.out.println("Connecting to database...");
             dbConnection = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db");
+            dbConnection.createStatement().execute("PRAGMA busy_timeout = 5000");
             System.out.println("Connected to database...");
             return true;
         } catch (SQLException e) {
@@ -188,15 +198,9 @@ public class Menu extends JFrame {
                 if (rs.next()) {
                     String name = rs.getString("Name");
                     String surname = rs.getString("Surname");
-                    String phoneNumber = rs.getString("Phone");
-                    String emailFromDB = rs.getString("Email");
-                    String passwordFromDB = rs.getString("Password");
-
-                    User user = new User(name, surname, phoneNumber, emailFromDB, passwordFromDB);
-
+                    loggedInUser = new User(name, surname, rs.getString("Phone"), email, password);
                     JOptionPane.showMessageDialog(null, "Login successful. Welcome, " + name + " " + surname);
-
-                    displayMainMenu(user);
+                    displayMainMenu();
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid email or password.");
                 }
@@ -207,7 +211,7 @@ public class Menu extends JFrame {
     }
 
     private void showProfile(User user) {
-        JPanel panel = new JPanel(new GridLayout(4, 2));
+        JPanel panel = new JPanel(new GridLayout(7, 2));
         nameField = new JTextField(user.getName());
         surnameField = new JTextField(user.getSurname());
         phoneField = new JTextField(user.getPhoneNumber());
@@ -224,9 +228,11 @@ public class Menu extends JFrame {
 
         JButton viewTicketsButton = new JButton("View Tickets");
         JButton cancelTicketsButton = new JButton("Cancel Tickets");
+        JButton updateProfileButton = new JButton("Update Profile");
 
         panel.add(viewTicketsButton);
         panel.add(cancelTicketsButton);
+        panel.add(updateProfileButton);
 
         viewTicketsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -240,46 +246,103 @@ public class Menu extends JFrame {
             }
         });
 
+        updateProfileButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateProfile(user);
+            }
+        });
+
         int result = JOptionPane.showConfirmDialog(null, panel, "Profile - " + user.getName(), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            // Here you can update the user's profile if needed
-            // For example, update the database with new information
+            // updates handled by the updateProfile method
         }
     }
 
+    private void updateProfile(User user) {
+        String name = nameField.getText();
+        String surname = surnameField.getText();
+        String phoneNumber = phoneField.getText();
+        String email = emailField.getText();
+
+        if (name.isEmpty() || surname.isEmpty() || phoneNumber.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Error: All fields are required.");
+            showProfile(user); // Show profile again if fields are empty
+        } else {
+            Connection con = null;
+            try {
+                con = DriverManager.getConnection("jdbc:sqlite:C:\\Users\\despina\\Desktop\\artscribe1.db");
+                con.createStatement().execute("PRAGMA busy_timeout = 5000"); // Set busy timeout to 5000ms (5 seconds)
+
+                String sql = "UPDATE User SET Name = ?, Surname = ?, Phone = ?, Email = ? WHERE Email = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setString(1, name);
+                stmt.setString(2, surname);
+                stmt.setString(3, phoneNumber);
+                stmt.setString(4, email);
+                stmt.setString(5, user.getEmail());
+
+                int rowsUpdated = stmt.executeUpdate();
+                if (rowsUpdated > 0) {
+                    user.setName(name);
+                    user.setSurname(surname);
+                    user.setPhoneNumber(phoneNumber);
+                    user.setEmail(email);
+
+                    JOptionPane.showMessageDialog(null, "Profile updated successfully.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error: Unable to update profile.");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage());
+            } finally {
+                if (con != null) {
+                    try {
+                        con.close();
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            showProfile(user); // Show updated profile
+        }
+    }
+
+   
     private void viewTickets(User user) {
-        // Implement functionality to view tickets for the user
+        
     }
 
     private void cancelTickets(User user) {
-        // Implement functionality to cancel tickets for the user
+       
     }
 
     private void scanQRCode() {
-        // Implement QR code scanning functionality
+        
     }
 
     private void searchMuseumsByCity() {
-        // Implement search by city functionality
+        
     }
 
     private void searchMuseumsByKeyword() {
-        // Implement search by keyword functionality
+      
     }
 
     private void onlineReservation() {
-        // Implement online reservation functionality
+        
     }
 
     private void checkTraffic() {
-        // Implement traffic checking functionality
+      
     }
 
     public static void main(String[] args) {
         if (establishConnection()) {
-            Menu menu = new Menu();
-            menu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            menu.displayInitialMenu();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    new Menu().displayInitialMenu();
+                }
+            });
         } else {
             System.out.println("Failed to establish database connection.");
         }
