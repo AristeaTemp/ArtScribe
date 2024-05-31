@@ -1,7 +1,9 @@
-import java.sql.*;
+package net.codejava;
+
+import java.sql.;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.;
 
 public class City {
     private String name;
@@ -13,19 +15,39 @@ public class City {
         this.museums = new ArrayList<>();
     }
 
-    // Check if the city exists in the database
+
     public static boolean cityExists(String cityName) {
         String query = "SELECT * FROM Cities WHERE Name = ?";
-        try (Connection connection = DriverManager.getConnection(DB_URL);
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, cityName);
             ResultSet resultSet = preparedStatement.executeQuery();
-            return resultSet.next(); // Returns true if city exists, false otherwise
+            return resultSet.next();
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
+    public static List<City> getAllCities() {
+        List<City> cities = new ArrayList<>();
+        String query = "SELECT * FROM Cities";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                String cityName = resultSet.getString("Name");
+                cities.add(new City(cityName));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cities;
+    }
+
+
+
+ 
 
     // Get a list of all museums in the city
     public List<Museum> getMuseums() {
