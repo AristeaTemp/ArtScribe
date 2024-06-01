@@ -1,8 +1,10 @@
+package net.codejava;
+
 import java.sql.*;
 import javax.swing.*;
 
 public class Bank {
-    private static final String DB_URL = "jdbc:sqlite:C:/Users/Αριστέα/OneDrive/Desktop/ArtScribe.db";
+    private static final String DB_URL ="jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db";
 
     public boolean processReservation(User user, double amount, String cardNumber, String expirationDate, String cardName, String cvv) {
         if (!verifyCreditCard(user, cardNumber, expirationDate, cardName, cvv)) {
@@ -47,6 +49,13 @@ public class Bank {
         worker.execute();
         return true;
     }
+  
+        public static String processPayment(String cardNumber, String expirationDate, String cvv, double amount) {
+            // Simulate payment processing
+            System.out.println("Payment successful.");
+            return "ok successful";
+        }
+    
 
 
     private boolean verifyCreditCard(User user, String cardNumber, String expirationDate, String cardName, String cvv) {
@@ -77,5 +86,3 @@ public class Bank {
         }
     }
 }
-
-   
