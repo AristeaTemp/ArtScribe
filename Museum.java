@@ -1,4 +1,3 @@
-
 package net.codejava;
 
 import java.sql.*;
@@ -29,18 +28,18 @@ public class Museum {
  
     public static Museum getMuseumByNameFromDatabase(String museumName) {
         Museum museum = null;
-        String query = "SELECT * FROM Museum WHERE name = ?";
+        String query = "SELECT * FROM Museum WHERE Museum_Name = ?";
         try (Connection connection = DriverManager.getConnection(DB_URL);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, museumName);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                String workHours = resultSet.getString("work_hours");
-                String address = resultSet.getString("address");
-                String category = resultSet.getString("category");
-                double ticketPrice = resultSet.getDouble("ticket_price");
+                String workHours = resultSet.getString("Work_hours");
+                String address = resultSet.getString("Address");
+                String category = resultSet.getString("Category");
+                double ticketPrice = resultSet.getDouble("Ticket_price");
                 String keyWord = resultSet.getString("key_word");
-                String trafficInfo = resultSet.getString("traffic_info");
+                String trafficInfo = resultSet.getString("TrafficInfo");
 
                 museum = new Museum(museumName, workHours, address, category, ticketPrice, keyWord, trafficInfo);
             }
@@ -55,13 +54,13 @@ public class Museum {
         List<Museum> museums = new ArrayList<>();
         String query = "SELECT * FROM Museum WHERE key_word LIKE ?";
 
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+        try (Connection connection = DriverManager.getConnection(DB_URL);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, "%" + keyword + "%");
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                String museumName = resultSet.getString("name");
+                String museumName = resultSet.getString("Museum_name");
                 String workHours = resultSet.getString("work_hours");
                 String address = resultSet.getString("address");
                 String category = resultSet.getString("category");
@@ -82,14 +81,14 @@ public class Museum {
     private Museum getMuseumById(int museumId) {
         Museum museum = null;
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+            Connection con = DriverManager.getConnection(DB_URL);
             String sql = "SELECT * FROM Museum WHERE Id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setInt(1, museumId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 // Retrieve museum details from the database
-                String name = rs.getString("Name");
+                String museumName = rs.getString("museumName");
                 String workHours = rs.getString("WorkHours");
                 String address = rs.getString("Address");
                 String category = rs.getString("Category");
@@ -108,6 +107,21 @@ public class Museum {
     public String getMuseumName() {
         return museumName;
     }
+    
+    private String name;
+
+    public Museum(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 
     public String getWorkHours() {
         return workHours;
@@ -158,7 +172,5 @@ public class Museum {
 
     public void setTrafficInfo(String TrafficInfo) {
     	this.TrafficInfo = TrafficInfo;
-    }
-    
-    
+    } 
 }
