@@ -1,24 +1,30 @@
 package net.codejava;
 
-import java.sql.;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.;
+import java.sql.*;
+
+
+
 
 public class City {
     private String name;
-    private List<Museum> museums;  // List to hold museums in the city
+    private List<Museum> museums;
 
-    // Constructor
     public City(String name) {
         this.name = name;
         this.museums = new ArrayList<>();
     }
 
-
     public static boolean cityExists(String cityName) {
         String query = "SELECT * FROM City WHERE City name = ?";
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//THEOS.db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, cityName);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -37,7 +43,9 @@ public class City {
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 String cityName = resultSet.getString("City name");
-                cities.add(new City(cityName));
+                City city = new City(cityName);
+                city.loadMuseums(); // Load museums for this city
+                cities.add(city);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -45,22 +53,32 @@ public class City {
         return cities;
     }
 
-
-
- 
-
-    // Get a list of all museums in the city
     public List<Museum> getMuseums() {
         return new ArrayList<>(museums);
     }
 
-    // Get the city's name
     public String getName() {
         return name;
     }
 
-    // Set the city's name
     public void setName(String name) {
         this.name = name;
+    }
+
+    // Load museums for this city
+    private void loadMuseums() {
+        String query = "SELECT * FROM Museum WHERE Museum_city = ?";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, this.name);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                String museumName = resultSet.getString("Museum_name");
+                Museum museum = new Museum(museumName);
+                museums.add(museum);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
