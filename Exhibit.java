@@ -37,4 +37,13 @@ public class Exhibit {
     public void setMuseum(Museum museum) {
         this.museum = museum;
     }
+    public String toString() {
+        return "Exhibit{" +
+                "number=" + number +
+                ", description='" + description + '\'' +
+                ", museum=" + museum +
+                '}';
+    }
+    
+    
 }
