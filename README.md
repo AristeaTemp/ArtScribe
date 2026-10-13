@@ -55,5 +55,3 @@ The course deliverables (in Greek) are in [`docs/ArtScribe_analysis_report.pdf`]
 ## Περιγραφή (Greek)
 Η εφαρμογή μας αποτελεί έναν καινοτόμο τρόπο ξενάγησης τυφλών ατόμων σε μουσεία, μέσω ηχητικής περιγραφής των εκθεμάτων. Η εφαρμογή περιέχει πλοήγηση σε μουσεία που συνεργάζονται με την ArtScribe, με λεπτομερείς αποδόσεις των εκθεμάτων, ώστε να διευκολύνεται η εμπειρία επίσκεψης και η επαφή με την τέχνη.
 
-## Team
-GitHub handles: [AristeaTemp](https://github.com/AristeaTemp), despinapap, ildahun, Gildamaz.
