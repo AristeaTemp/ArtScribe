@@ -1,0 +1,19 @@
+# Compiled output
+bin/
+out/
+*.class
+
+# IDE files
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+.vscode/
+
+# Third-party jars (download the SQLite JDBC driver yourself, see README)
+lib/*.jar
+
+# OS files
+.DS_Store
+Thumbs.db

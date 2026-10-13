@@ -24,7 +24,7 @@ public class City {
 
     public static boolean cityExists(String cityName) {
         String query = "SELECT * FROM City WHERE City name = ?";
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, cityName);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -38,7 +38,7 @@ public class City {
     public static List<City> getAllCities() {
         List<City> cities = new ArrayList<>();
         String query = "SELECT * FROM City";
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -68,7 +68,7 @@ public class City {
     // Load museums for this city
     private void loadMuseums() {
         String query = "SELECT * FROM Museum WHERE Museum_city = ?";
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, this.name);
             ResultSet resultSet = preparedStatement.executeQuery();

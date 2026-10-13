@@ -4,7 +4,7 @@ import java.sql.*;
 import javax.swing.*;
 
 public class Bank {
-    private static final String DB_URL ="jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db";
+    private static final String DB_URL ="jdbc:sqlite:db/artscribe.db";
 
     public boolean processReservation(User user, double amount, String cardNumber, String expirationDate, String cardName, String cvv) {
         if (!verifyCreditCard(user, cardNumber, expirationDate, cardName, cvv)) {

@@ -213,7 +213,7 @@ public class Menu extends JFrame {
             return;
         }
 
-        try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db")) {
+        try (Connection con = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db")) {
             String sql = "INSERT INTO User (Name, Surname, Email, Phone, Password) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, name);
@@ -240,7 +240,7 @@ public class Menu extends JFrame {
             return false;
         }
 
-        try (Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db")) {
+        try (Connection con = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db")) {
             String sql = "SELECT * FROM User WHERE Email = ? AND Password = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, email);
@@ -331,7 +331,7 @@ public class Menu extends JFrame {
     public static boolean establishConnection() {
         try {
             System.out.println("Connecting to database...");
-            dbConnection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+            dbConnection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
             dbConnection.createStatement().execute("PRAGMA busy_timeout = 5000");
             System.out.println("Connected to database...");
             return true;
@@ -409,7 +409,7 @@ public class Menu extends JFrame {
         } else {
             Connection con = null;
             try {
-                con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+                con = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
                 con.createStatement().execute("PRAGMA busy_timeout = 5000"); // Set busy timeout to 5000ms (5 seconds)
 
                 String sql = "UPDATE User SET Name = ?, Surname = ?, Phone = ?, Email = ? WHERE Email = ?";
@@ -494,13 +494,14 @@ public class Menu extends JFrame {
         String query = "SELECT * FROM exhibit WHERE museum = ?";
         List<Exhibit> exhibits = new ArrayList<>();
 
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, museumName);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     int number = resultSet.getInt("number");
                     String description = resultSet.getString("description");
-                    Exhibit exhibit = new Exhibit(number, description, museumName);
+                    Exhibit exhibit = new Exhibit(number, description, new Museum(museumName));
                     exhibits.add(exhibit);
                 }
             }
@@ -543,7 +544,7 @@ public class Menu extends JFrame {
     private Exhibit getExhibitByNumber(int exhibitNumber) {
         Exhibit exhibit = null;
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+            Connection con = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
             String sql = "SELECT * FROM Exhibit WHERE Number = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setInt(1, exhibitNumber);
@@ -566,7 +567,7 @@ public class Menu extends JFrame {
     private Museum getMuseumById(int museumId) {
         Museum museum = null;
         try {
-            Connection con = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+            Connection con = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
             String sql = "SELECT * FROM Museum WHERE Id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setInt(1, museumId);
@@ -593,7 +594,7 @@ public class Menu extends JFrame {
         Exhibit exhibit = null;
         String query = "SELECT * FROM Exhibit WHERE QRCode = ?";
 
-        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db");
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:db/artscribe.db");
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, qrCode);
             ResultSet resultSet = statement.executeQuery();

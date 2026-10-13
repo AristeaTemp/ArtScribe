@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Museum {
-    private static final String DB_URL = "jdbc:sqlite:/C://Users//Αριστέα//Downloads//artscribe (1).db";
+    private static final String DB_URL = "jdbc:sqlite:db/artscribe.db";
     
     private String museumName;
     private String workHours;

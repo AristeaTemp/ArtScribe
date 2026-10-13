@@ -1,18 +1,45 @@
-Project ArtScribe
+# ArtScribe
 
-Περιγραφή:
-Η εφαρμογή μας αποτελεί έναν καινοτόμο τρόπο ξενάγησης τυφλών
-ατόμων σε μουσεία, μέσω ηχητικής περιγραφής των εκθεμάτων. Πιο
-συγκεκριμένα, η εφαρμογή περιέχει πλοήγηση σε μουσεία, που
-συνεργάζονται με την ArtScribe, με λεπτομερείς αποδόσεις των
-εκθεμάτων. Έτσι, διευκολύνουμε την εμπειρία επίσκεψης στα μουσεία
-προσφέροντας την επαφή με την τέχνη με έναν πιο άμεσο τρόπο.
+A Java desktop application that makes museums more accessible to blind and visually impaired visitors, through **audio-friendly descriptions of exhibits**. Users can browse partner museums, read detailed exhibit descriptions, and book tickets online.
 
-Λειτουργικότητα:
-Υπάρχουν σε .java αρχεία όλες οι κλάσεις που δημιουργήσαμε μαζί με το .db αρχείο- την βάση δεδομένων μας- ,
-που αποτελούν την εφαρμογή μας, και εργαζόμαστε σε Eclipse IDE (SQLite για την database). Οι κλάσεις User,
-Museum, Exhibit, City, Bank, Reservation και ScanQR περιέχουν setters,getters για τα βασικά πεδία τους 
-και μεθόδους αντίστοιχα για την λειτουργία τους. Τρέχουμε την Menu class, η οποία περιέχει αρχικά 
-το sign in/sign up και έπειτα το μενού όπου υπάρχουν οι λειτουργίες του app μας : επεξεργασία προφίλ,
-εισιτήρια, αποσύνδεση, σκανάρισμα QR, αναζήτηση μουσείου με βάση πόλη/keyword, online κράτηση εισιτηρίου,
-δυνατότητα επισκόπησης κίνησης και exit.
+Team project for the *Software Engineering* course (2024), Department of Computer Engineering & Informatics, University of Patras. Built by a team of four.
+
+## Features
+- Sign up / sign in
+- Edit profile, view and cancel tickets
+- Search museums by **city** or **keyword**
+- Online ticket reservation (with a simulated payment step)
+- QR code scanning of exhibits (prototype, simulated)
+- Museum traffic information
+
+## Tech stack
+Java (Swing GUI), SQLite via JDBC (`sqlite-jdbc`), developed in Eclipse.
+
+## Project structure
+```
+src/net/codejava/   # application classes (Menu = entry point, User, Museum, City, Exhibit, Reservation, Bank)
+src/ScanQR.java     # standalone QR-scan prototype
+db/artscribe.db     # SQLite database with demo data (13 museums, 14 exhibits, 5 cities)
+db/schema.sql       # database schema
+```
+
+## How to run
+1. Install a JDK (11 or newer).
+2. Download the [SQLite JDBC driver](https://github.com/xerial/sqlite-jdbc/releases) (`sqlite-jdbc-*.jar`).
+3. In Eclipse: *File → Import → Existing Projects* (or create a Java project and copy `src/`), then add the jar to the build path.
+4. Run `net.codejava.Menu`. The working directory must be the project root, so that `db/artscribe.db` is found.
+
+## Demo data
+The database contains fictional demo users (`demo.user1@example.com` … `demo.user15@example.com`, password `demo1234`).
+
+## Status and known limitations
+This repository is an **academic prototype** and a snapshot of the course project:
+- Some SQL queries in the code use table/column names that differ from the schema in `db/schema.sql`, so some features (e.g. keyword search, exhibit lookup, payments) do not work with this database yet.
+- QR scanning is simulated and passwords are stored in plain text. Neither should be used in production.
+- There are no automated tests.
+
+## Περιγραφή (Greek)
+Η εφαρμογή μας αποτελεί έναν καινοτόμο τρόπο ξενάγησης τυφλών ατόμων σε μουσεία, μέσω ηχητικής περιγραφής των εκθεμάτων. Η εφαρμογή περιέχει πλοήγηση σε μουσεία που συνεργάζονται με την ArtScribe, με λεπτομερείς αποδόσεις των εκθεμάτων, ώστε να διευκολύνεται η εμπειρία επίσκεψης και η επαφή με την τέχνη.
+
+## Team
+GitHub handles: [AristeaTemp](https://github.com/AristeaTemp), despinapap, ildahun, Gildamaz.
