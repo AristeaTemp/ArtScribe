@@ -64,5 +64,5 @@ The course deliverables (in Greek) are in [`docs/ArtScribe_analysis_report.pdf`]
 | Despoina Papadopoulou | [@despinapap](https://github.com/despinapap) |
 | Ilda Hunci | [@ildahun](https://github.com/ildahun) |
 
-Four-person team project for the course "Software Engineering" (University of Patras). Uploaded to GitHub after the course had ended.
+Four-person team project for the course "Software Engineering" (University of Patras)
 
