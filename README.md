@@ -55,3 +55,14 @@ The course deliverables (in Greek) are in [`docs/ArtScribe_analysis_report.pdf`]
 ## Περιγραφή (Greek)
 Η εφαρμογή μας αποτελεί έναν καινοτόμο τρόπο ξενάγησης τυφλών ατόμων σε μουσεία, μέσω ηχητικής περιγραφής των εκθεμάτων. Η εφαρμογή περιέχει πλοήγηση σε μουσεία που συνεργάζονται με την ArtScribe, με λεπτομερείς αποδόσεις των εκθεμάτων, ώστε να διευκολύνεται η εμπειρία επίσκεψης και η επαφή με την τέχνη.
 
+## Team
+
+| Name | GitHub |
+|---|---|
+| Aristea Tempelopoulou | [@AristeaTemp](https://github.com/AristeaTemp) |
+| Anna-Gilda Mazaraki | [@Gildamaz](https://github.com/Gildamaz) |
+| Despoina Papadopoulou | [@despinapap](https://github.com/despinapap) |
+| Ilda Hunci | [@ildahun](https://github.com/ildahun) |
+
+Four-person team project for the course "Software Engineering" (University of Patras). Uploaded to GitHub after the course had ended.
+
